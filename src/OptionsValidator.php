@@ -9,17 +9,22 @@ final class OptionsValidator
         return filter_var($url, FILTER_VALIDATE_URL);
     }
 
-    public static function isHeadersValid($headers): bool
+    public static function isHeadersValid(string $headers): bool
     {
         return true;
     }
 
-    public static function isParamsValid($params): bool
+    public static function isParamsValid(string $params): bool
     {
         return true;
     }
 
-    public static function isBodyValid($body): bool
+    public static function isBodyValid(string $body): bool
+    {
+        return true;
+    }
+
+    public static function isCookiesValid(string $cookies):bool
     {
         return true;
     }

@@ -57,6 +57,9 @@ final class Init
         if (!OptionsValidator::isHeadersValid($options['headers']))
             return false;
 
+        if(!OptionsValidator::isCookiesValid($options['cookies']))
+            return false;
+
         if (isset($options['body']) && !OptionsValidator::isBodyValid($options['body']))
             return false;
 
