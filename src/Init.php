@@ -4,36 +4,34 @@ namespace Hasanparasteh\CurlAsProxy;
 
 final class Init
 {
-    public function requiredOptions(): array
+    public static function requiredOptions(): array
     {
-        $requiredOptionsList = [
+        return [
             'url',
-            'headers',
-            'params',
-            'cookies'
+            'method'
         ];
-
-        if (in_array($_SERVER['REQUEST_METHOD'], ['GET', 'DELETE'], true)) {
-            return $requiredOptionsList;
-        }
-
-        $requiredOptionsList[] = 'body';
-        return $requiredOptionsList;
     }
 
-    public function getOptionsList(): array
+    public static function getOptionsList(): array
     {
+        $body = API::getBody();
         $options = [];
-        foreach ($this->requiredOptions() as $option) {
-            $options[$option] = $_REQUEST[$option];
+
+        foreach (self::requiredOptions() as $option) {
+            $options[$option] = $body[$option];
         }
+
+        if (isset($body['body']))
+            $options['body'] = $body['body'];
+
         return $options;
     }
 
     private function isRequiredOptionsSet(): bool
     {
+        $body = API::getBody();
         foreach (self::requiredOptions() as $opt) {
-            if (!isset($_REQUEST[$opt])) {
+            if (!isset($body[$opt])) {
                 return false;
             }
         }
@@ -43,32 +41,23 @@ final class Init
 
     public function isRequiredOptionsValid(): bool
     {
-        if (!self::isRequiredOptionsSet())
+        if (!$this->isRequiredOptionsSet())
             return false;
 
-        $options = $this->getOptionsList();
-
-        if (!OptionsValidator::isURLValid($options['url']))
+        $options = self::getOptionsList();
+        if (!OptionsValidator::isMethodValid($options['method']))
             return false;
 
-        if (!OptionsValidator::isParamsValid($options['params']))
-            return false;
-
-        if (!OptionsValidator::isHeadersValid($options['headers']))
-            return false;
-
-        if(!OptionsValidator::isCookiesValid($options['cookies']))
-            return false;
-
-        if (isset($options['body']) && !OptionsValidator::isBodyValid($options['body']))
+        if (API::isLoadedMethod($options['method']) && !isset($options['body']))
             return false;
 
         return true;
+
     }
 
     public function init(): bool|array
     {
-        if ($this->isRequiredOptionsValid()) {
+        if ($this->isRequiredOptionsValid() && API::getRequestMethod() == "POST") {
             return true;
         }
 

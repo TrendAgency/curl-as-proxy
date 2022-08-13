@@ -2,29 +2,29 @@
 
 namespace Hasanparasteh\CurlAsProxy;
 
-class Requester
+class Requester extends CurlMaker
 {
-    protected readonly array $options;
-    protected readonly string $method;
-
-    public int $statusCode;
-    public array $responseBody;
+    public int|null $statusCode;
+    public array|null $responseBody;
 
     public bool $hasError = false;
-    public string $error = "";
+    public array $error = [];
 
-    public function __construct(array $options, string $method)
+    public function __construct()
     {
-        $this->options = $options;
-        $this->method = $method;
+        parent::__construct();
     }
 
     public function execute(): void
     {
-        $this->statusCode = 200;
-        $this->responseBody = [
-            'method' => $this->method,
-            'options'=> $this->options
-        ];
+        $result = $this->doRequest();
+
+        if (!$result['result']) {
+            $this->hasError = true;
+            $this->error = ['result' => false, 'error' => $result['error'] ?? "UNKNOWN"];
+        } else {
+            $this->statusCode = $result['statusCode'];
+            $this->responseBody = $result['responseBody'];
+        }
     }
 }

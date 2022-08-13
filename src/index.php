@@ -12,7 +12,9 @@ API::setupBasicHeaders();
 $initiator = new Init();
 
 if ($initiator->init()) {
-    $requester = new Requester($initiator->getOptionsList(), API::getRequestMethod());
+
+
+    $requester = new Requester();
 
     $requester->execute();
 

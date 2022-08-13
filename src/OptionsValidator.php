@@ -28,4 +28,10 @@ final class OptionsValidator
     {
         return true;
     }
+    public static function isMethodValid(string $method) : bool
+    {
+        if (in_array($method , ["POST" , "PUT" , "PATCH" , "GET" , "DELETE"], true))
+            return true;
+        return false;
+    }
 }
