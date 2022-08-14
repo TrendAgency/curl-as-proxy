@@ -27,6 +27,10 @@ class CurlMaker
         $this->opt[CURLOPT_HTTPHEADER] = API::getBody()['headers'];
         $this->opt[CURLOPT_SSL_VERIFYHOST] = 0;
         $this->opt[CURLOPT_SSL_VERIFYPEER] = 0;
+        $this->opt[CURLOPT_HEADER] = 1;
+        $this->opt[CURLOPT_POSTREDIR] = 3;
+
+
     }
 
     public function setUrl(): void
@@ -42,6 +46,16 @@ class CurlMaker
     public function setBody(): void
     {
         $this->opt[CURLOPT_POSTFIELDS] = json_encode($this->body['body']);
+    }
+
+    private function parseResponseHeaders(string $headers): array
+    {
+        $final = [];
+        foreach (explode(PHP_EOL, trim($headers)) as $header) {
+            $exploded = explode(":", $header);
+            $final[$exploded[0]] = is_numeric($exploded[1]) ? intval($exploded[1]) : trim($exploded[1]);
+        }
+        return $final;
     }
 
     private function handleBadHttpStatusCodes(int $statusCode, array|string|null $message = null)
@@ -80,17 +94,26 @@ class CurlMaker
             ];
         }
 
+        // Parse Header
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $headers = $this->parseResponseHeaders(substr($response, 0, $header_size));
 
+        // Get status and response
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $response = (array)json_decode($response, true);
+        $response = substr($response, $header_size);
 
-        if (in_array($status, [405, 400, 500])) {
+        if (in_array($status, [405, 400, 500]))
             return $this->handleBadHttpStatusCodes($status, $response);
-        }
+
+        if(str_contains(strtolower($headers['Content-Type']), "application/json"))
+            $response = (array)json_decode($response, true);
+        else
+            $response = trim(preg_replace('/\s\s+/', ' ', $response));
 
         return [
             'result' => true,
             'responseBody' => $response,
+            'headers' => $headers,
             'statusCode' => $status ?? 500
         ];
 

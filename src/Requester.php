@@ -5,7 +5,7 @@ namespace Trend\CurlAsProxy;
 class Requester extends CurlMaker
 {
     public int|null $statusCode;
-    public array|null $responseBody;
+    public array|string|null $responseBody;
 
     public bool $hasError = false;
     public array $error = [];
@@ -24,7 +24,11 @@ class Requester extends CurlMaker
             $this->error = ['result' => false, 'error' => $result['error'] ?? "UNKNOWN"];
         } else {
             $this->statusCode = $result['statusCode'];
-            $this->responseBody = $result['responseBody'];
+            $this->responseBody = [
+                'result' => true,
+                'body' => $result['responseBody'],
+                'headers' => $result['headers']
+            ];
         }
     }
 }
