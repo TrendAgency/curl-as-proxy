@@ -1,6 +1,6 @@
 <?php
 
-namespace Hasanparasteh\CurlAsProxy;
+namespace Trend\CurlAsProxy;
 
 final class OptionsValidator
 {
@@ -9,28 +9,9 @@ final class OptionsValidator
         return filter_var($url, FILTER_VALIDATE_URL);
     }
 
-    public static function isHeadersValid(string $headers): bool
+    public static function isMethodValid(string $method): bool
     {
-        return true;
-    }
-
-    public static function isParamsValid(string $params): bool
-    {
-        return true;
-    }
-
-    public static function isBodyValid(string $body): bool
-    {
-        return true;
-    }
-
-    public static function isCookiesValid(string $cookies):bool
-    {
-        return true;
-    }
-    public static function isMethodValid(string $method) : bool
-    {
-        if (in_array($method , ["POST" , "PUT" , "PATCH" , "GET" , "DELETE"], true))
+        if (in_array($method, ["POST", "PUT", "PATCH", "GET", "DELETE"], true))
             return true;
         return false;
     }

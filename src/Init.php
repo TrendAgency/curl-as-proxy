@@ -1,6 +1,6 @@
 <?php
 
-namespace Hasanparasteh\CurlAsProxy;
+namespace Trend\CurlAsProxy;
 
 final class Init
 {
@@ -45,6 +45,10 @@ final class Init
             return false;
 
         $options = self::getOptionsList();
+
+        if (!OptionsValidator::isURLValid($options['url']))
+            return false;
+
         if (!OptionsValidator::isMethodValid($options['method']))
             return false;
 

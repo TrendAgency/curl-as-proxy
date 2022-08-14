@@ -1,8 +1,9 @@
 <?php
 
-use Hasanparasteh\CurlAsProxy\API;
-use Hasanparasteh\CurlAsProxy\Init;
-use Hasanparasteh\CurlAsProxy\Requester;
+
+use Trend\CurlAsProxy\API;
+use Trend\CurlAsProxy\Init;
+use Trend\CurlAsProxy\Requester;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 

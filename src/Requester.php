@@ -1,6 +1,6 @@
 <?php
 
-namespace Hasanparasteh\CurlAsProxy;
+namespace Trend\CurlAsProxy;
 
 class Requester extends CurlMaker
 {

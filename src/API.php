@@ -1,12 +1,12 @@
 <?php
 
-namespace Hasanparasteh\CurlAsProxy;
+namespace Trend\CurlAsProxy;
 
 class API
 {
     public static function response(int|null $status, array|string|null $response): void
     {
-        if(is_null($status) || is_null($response)){
+        if (is_null($status) || is_null($response)) {
             die();
         }
 
@@ -28,32 +28,18 @@ class API
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    public static function getCookies():array
+    public static function getCookies(): array
     {
         return $_COOKIE;
     }
 
-    public static function getHeaders():array
+    public static function getBody(): array
     {
-        $headers = array();
-        foreach($_SERVER as $key => $value) {
-            if (!str_starts_with($key, 'HTTP_')) {
-                continue;
-            }
-            $header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
-            $headers[$header] = $value;
-        }
-
-        return $headers;
-
+        return json_decode(file_get_contents('php://input'), true);
     }
 
-    public static function getBody():array
+    public static function isLoadedMethod(string $method): bool
     {
-        return json_decode(file_get_contents('php://input'),true);
-    }
-    public static function isLoadedMethod(string $method):bool
-    {
-        return !in_array($method , ["GET" , "DELETE"],true);
+        return !in_array($method, ["GET", "DELETE"], true);
     }
 }

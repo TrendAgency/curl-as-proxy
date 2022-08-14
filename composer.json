@@ -1,18 +1,22 @@
 {
-    "name": "hasanparasteh/curl-as-proxy",
-    "type": "project",
-    "autoload": {
-        "psr-4": {
-            "Hasanparasteh\\CurlAsProxy\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Hasan Parasteh",
-            "email": "hasanparasteh@gmail.com"
-        }
-    ],
-    "require": {
-      "ext-curl": "*"
+  "name": "trend/curl-as-proxy",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "Trend\\CurlAsProxy\\": "src/"
     }
+  },
+  "authors": [
+    {
+      "name": "Hasan Parasteh",
+      "email": "hasanparasteh@gmail.com"
+    },
+    {
+      "name": "Hossein Heydari",
+      "email": "hoseynh30@gmail.com"
+    }
+  ],
+  "require": {
+    "ext-curl": "*"
+  }
 }
