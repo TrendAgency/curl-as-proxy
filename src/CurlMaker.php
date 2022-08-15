@@ -41,19 +41,17 @@ class CurlMaker
 
     private function setVersion(): void
     {
-        $version = API::getBody()['version'];
-
-        if (isset($version)) {
-            if (!empty($version)) {
-                $this->opt[CURLOPT_HTTP_VERSION] = match ($version) {
-                    1 => CURL_HTTP_VERSION_1_0,
-                    1.1 => CURL_HTTP_VERSION_1_1,
-                    2 => CURL_HTTP_VERSION_2,
-                    default => CURL_HTTP_VERSION_3,
-                };
-            }
+        if (isset(API::getBody()['version'])) {
+            $version = API::getBody()['version'];
+            $this->opt[CURLOPT_HTTP_VERSION] = match ($version) {
+                1 => CURL_HTTP_VERSION_1_0,
+                1.1 => CURL_HTTP_VERSION_1_1,
+                2 => CURL_HTTP_VERSION_2,
+                default => CURL_HTTP_VERSION_3,
+            };
+        } else {
+            $this->opt[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_3;
         }
-
     }
 
     private function implementCookies(): void
@@ -98,6 +96,7 @@ class CurlMaker
                 return ['result' => false, "error" => "Method Not Allowed"];
         }
     }
+
     private static function parseResponseHeaders(string $headers): array
     {
         $final = [];
