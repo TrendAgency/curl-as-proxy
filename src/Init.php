@@ -52,7 +52,13 @@ final class Init
         if (!OptionsValidator::isMethodValid($options['method']))
             return false;
 
-        if (API::isLoadedMethod($options['method']) && !isset($options['body']))
+        if (isset(API::getBody()['headers'])&& !OptionsValidator::isHeaderValid(API::getBody()['headers']))
+                return false;
+
+        if (isset(API::getBody()['cookies'])&& !OptionsValidator::isJsonValid(json_encode(API::getBody()['cookies'])))
+                return false;
+
+        if (isset(API::getBody()['body']) && !OptionsValidator::isJsonValid(json_encode(API::getBody()['body'])))
             return false;
 
         return true;

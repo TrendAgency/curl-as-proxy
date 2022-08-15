@@ -23,7 +23,6 @@ class CurlMaker
         $this->opt[CURLOPT_MAXREDIRS] = 10;
         $this->opt[CURLOPT_TIMEOUT] = 0;
         $this->opt[CURLOPT_FOLLOWLOCATION] = true;
-
         $this->opt[CURLOPT_SSL_VERIFYHOST] = 0;
         $this->opt[CURLOPT_SSL_VERIFYPEER] = 0;
         $this->opt[CURLOPT_HEADER] = 1;
@@ -33,7 +32,11 @@ class CurlMaker
 
     private function setHeaders(): void
     {
-        $this->opt[CURLOPT_HTTPHEADER] = API::getBody()['headers'];
+        $body = API::getBody();
+        if (!isset($body['headers']))
+            $body['headers'][] = "Content-Type: text/html; charset=UTF-8";
+
+        $this->opt[CURLOPT_HTTPHEADER] = $body['headers'];
     }
 
     private function setVersion(): void
@@ -43,7 +46,8 @@ class CurlMaker
         if (isset($version)) {
             if (!empty($version)) {
                 $this->opt[CURLOPT_HTTP_VERSION] = match ($version) {
-                    1 => CURL_HTTP_VERSION_1_1,
+                    1 => CURL_HTTP_VERSION_1_0,
+                    1.1 => CURL_HTTP_VERSION_1_1,
                     2 => CURL_HTTP_VERSION_2,
                     default => CURL_HTTP_VERSION_3,
                 };
@@ -82,16 +86,6 @@ class CurlMaker
         $this->opt[CURLOPT_POSTFIELDS] = json_encode($this->body['body']);
     }
 
-    private function parseResponseHeaders(string $headers): array
-    {
-        $final = [];
-        foreach (explode(PHP_EOL, trim($headers)) as $header) {
-            $exploded = explode(":", $header);
-            if (!empty($exploded[1]))
-                $final[$exploded[0]] = is_numeric($exploded[1]) ? intval($exploded[1]) : trim($exploded[1]);
-        }
-        return $final;
-    }
 
     private function handleBadHttpStatusCodes(int $statusCode, array|string|null $message = null)
     {
@@ -104,6 +98,16 @@ class CurlMaker
                 return ['result' => false, "error" => "Method Not Allowed"];
         }
     }
+    private static function parseResponseHeaders(string $headers): array
+    {
+        $final = [];
+        foreach (explode(PHP_EOL, trim($headers)) as $header) {
+            $exploded = explode(":", $header);
+            if (!empty($exploded[1]))
+                $final[$exploded[0]] = is_numeric($exploded[1]) ? intval($exploded[1]) : trim($exploded[1]);
+        }
+        return $final;
+    }
 
     protected function doRequest(): array
     {
@@ -115,10 +119,8 @@ class CurlMaker
             $this->setBody();
 
         $this->setHeaders();
-        $this->implementCookies();
+        //$this->implementCookies();
 
-
-        echo json_encode($this->opt[CURLOPT_HTTPHEADER], 128);
 
         // Setup Curl
         $curl = curl_init();

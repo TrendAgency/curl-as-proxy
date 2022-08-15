@@ -2,6 +2,8 @@
 
 namespace Trend\CurlAsProxy;
 
+use Exception;
+
 final class OptionsValidator
 {
     public static function isURLValid($url): bool
@@ -15,4 +17,32 @@ final class OptionsValidator
             return true;
         return false;
     }
+
+    public static function isHeaderValid($headers): bool
+    {
+        if (!is_array($headers))
+            return false;
+
+        $arr = [];
+        foreach ($headers as $header) {
+            $checkContentType = explode(":", $header);
+            $arr[$checkContentType[0]] = $checkContentType[1];
+        }
+
+        if (!array_key_exists("Content-Type", $arr))
+            return false;
+
+        return true;
+    }
+
+    public static  function isJsonValid(string $json):bool
+    {
+        try {
+            json_decode($json, null, flags: JSON_THROW_ON_ERROR);
+            return true;
+        } catch  (Exception $e) {
+            return false;
+        }
+    }
+
 }

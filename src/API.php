@@ -42,4 +42,6 @@ class API
     {
         return !in_array($method, ["GET", "DELETE"], true);
     }
+
+
 }
