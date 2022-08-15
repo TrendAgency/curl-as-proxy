@@ -28,19 +28,9 @@ class API
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
     }
 
-    public static function extractContentType(string $type): string
-    {
-        return explode(";", $type)[0];
-    }
-
     public static function getRequestMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
-    }
-
-    public static function getCookies(): array
-    {
-        return $_COOKIE;
     }
 
     public static function getBody(): array

@@ -23,14 +23,48 @@ class CurlMaker
         $this->opt[CURLOPT_MAXREDIRS] = 10;
         $this->opt[CURLOPT_TIMEOUT] = 0;
         $this->opt[CURLOPT_FOLLOWLOCATION] = true;
-        $this->opt[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_3;
-        $this->opt[CURLOPT_HTTPHEADER] = API::getBody()['headers'];
+
         $this->opt[CURLOPT_SSL_VERIFYHOST] = 0;
         $this->opt[CURLOPT_SSL_VERIFYPEER] = 0;
         $this->opt[CURLOPT_HEADER] = 1;
         $this->opt[CURLOPT_POSTREDIR] = 3;
 
+    }
 
+    private function setHeaders(): void
+    {
+        $this->opt[CURLOPT_HTTPHEADER] = API::getBody()['headers'];
+    }
+
+    private function setVersion(): void
+    {
+        $version = API::getBody()['version'];
+
+        if (isset($version)) {
+            if (!empty($version)) {
+                $this->opt[CURLOPT_HTTP_VERSION] = match ($version) {
+                    1 => CURL_HTTP_VERSION_1_1,
+                    2 => CURL_HTTP_VERSION_2,
+                    default => CURL_HTTP_VERSION_3,
+                };
+            }
+        }
+
+    }
+
+    private function implementCookies(): void
+    {
+        if (!empty(API::getBody()['cookies']))
+            if (is_array(API::getBody()['cookies'])) {
+                $cookies = "";
+                foreach (API::getBody()['cookies'] as $cookieKey => $cookieValue) {
+                    $cookies .= "$cookieKey=$cookieValue;";
+                }
+
+                $this->opt[CURLOPT_HTTPHEADER][] = "Cookie: $cookies";
+            } else {
+                $this->opt[CURLOPT_HTTPHEADER][] = "Cookie: " . API::getBody()['cookies'];
+            }
     }
 
     public function setUrl(): void
@@ -53,7 +87,8 @@ class CurlMaker
         $final = [];
         foreach (explode(PHP_EOL, trim($headers)) as $header) {
             $exploded = explode(":", $header);
-            $final[$exploded[0]] = is_numeric($exploded[1]) ? intval($exploded[1]) : trim($exploded[1]);
+            if (!empty($exploded[1]))
+                $final[$exploded[0]] = is_numeric($exploded[1]) ? intval($exploded[1]) : trim($exploded[1]);
         }
         return $final;
     }
@@ -75,8 +110,15 @@ class CurlMaker
         $this->setCurlOptions();
         $this->setUrl();
         $this->setMethod();
+        $this->setVersion();
         if (API::isLoadedMethod($this->body['method']))
             $this->setBody();
+
+        $this->setHeaders();
+        $this->implementCookies();
+
+
+        echo json_encode($this->opt[CURLOPT_HTTPHEADER], 128);
 
         // Setup Curl
         $curl = curl_init();
@@ -98,6 +140,7 @@ class CurlMaker
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         $headers = $this->parseResponseHeaders(substr($response, 0, $header_size));
 
+
         // Get status and response
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $response = substr($response, $header_size);
@@ -105,10 +148,11 @@ class CurlMaker
         if (in_array($status, [405, 400, 500]))
             return $this->handleBadHttpStatusCodes($status, $response);
 
-        if(str_contains(strtolower($headers['Content-Type']), "application/json"))
+        if (str_contains(strtolower($headers['Content-Type']), "application/json"))
             $response = (array)json_decode($response, true);
         else
             $response = trim(preg_replace('/\s\s+/', ' ', $response));
+
 
         return [
             'result' => true,
