@@ -150,7 +150,7 @@ class CurlMaker
         if (in_array($status, [405, 400, 500]))
             return $this->handleBadHttpStatusCodes($status, $response);
 
-        if (str_contains(strtolower($headers['Content-Type']), "application/json"))
+        if (str_contains(strtolower($headers['content-type']), "application/json"))
             $response = (array)json_decode($response, true);
         else
             $response = trim(preg_replace('/\s\s+/', ' ', $response));
