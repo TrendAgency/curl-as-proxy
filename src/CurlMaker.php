@@ -19,7 +19,7 @@ class CurlMaker
     public function setCurlOptions(): void
     {
         $this->opt[CURLOPT_RETURNTRANSFER] = true;
-        $this->opt[CURLOPT_ENCODING] = 'gzip,deflate,br';
+        $this->opt[CURLOPT_ENCODING] = '';
         $this->opt[CURLOPT_MAXREDIRS] = 10;
         $this->opt[CURLOPT_TIMEOUT] = 0;
         $this->opt[CURLOPT_FOLLOWLOCATION] = true;
