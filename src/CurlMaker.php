@@ -119,7 +119,7 @@ class CurlMaker
             $this->setBody();
 
         $this->setHeaders();
-        //$this->implementCookies();
+        $this->implementCookies();
 
 
         // Setup Curl
