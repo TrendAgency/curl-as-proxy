@@ -27,10 +27,8 @@ class CurlMaker
         $this->opt[CURLOPT_SSL_VERIFYPEER] = 0;
         $this->opt[CURLOPT_HEADER] = 1;
         $this->opt[CURLOPT_POSTREDIR] = 3;
-
+        $this->opt[CURLOPT_FRESH_CONNECT] = true;
     }
-
-
 
 
     private function setHeaders(): void
