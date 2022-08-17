@@ -109,6 +109,34 @@ class CurlMaker
         return $final;
     }
 
+
+    private function calculatePermutations($text) {
+
+        $permutations = array();
+        $chars = str_split($text);
+        for ($i = 0; $i < 2 ** strlen($text); $i++) {
+            for ($j = 0; $j < strlen($text); $j++) {
+                $permutations[$i][] = ($this->isBitSet($i, $j))
+                    ? strtoupper($chars[$j])
+                    : $chars[$j];
+            }
+            $permutations[$i] = implode("", $permutations[$i]);
+        }
+        return $permutations;
+    }
+    private function isBitSet($n, $offset) {
+        return ($n >> $offset & 1) != 0;
+    }
+
+    private function findContentTypeKey(array $per, array $headers)
+    {
+        foreach ($per as $key) {
+            if (isset($headers[$key]))
+                return $key;
+        }
+        return false;
+    }
+
     protected function doRequest(): array
     {
         $this->setCurlOptions();
@@ -150,11 +178,11 @@ class CurlMaker
         if (in_array($status, [405, 400, 500]))
             return $this->handleBadHttpStatusCodes($status, $response);
 
-        if (str_contains(strtolower($headers['content-type']), "application/json"))
-            $response = (array)json_decode($response, true);
-        else
-            $response = trim(preg_replace('/\s\s+/', ' ', $response));
-
+            $key = $this->findContentTypeKey($this->calculatePermutations("content-type"), $headers);
+            if ($key && str_contains($headers[$key], "application/json"))
+               $response = (array)json_decode($response, true);
+            else
+                $response = trim(preg_replace('/\s\s+/', ' ', $response));
 
         return [
             'result' => true,
