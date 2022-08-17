@@ -27,7 +27,8 @@ class Requester extends CurlMaker
             $this->responseBody = [
                 'result' => true,
                 'body' => $result['responseBody'],
-                'headers' => $result['headers']
+                'headers' => $result['headers'],
+                'statusCode' => $result['statusCode']
             ];
         }
     }
