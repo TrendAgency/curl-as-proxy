@@ -139,6 +139,7 @@ class CurlMaker
 
     protected function doRequest(): array
     {
+        $time1 =  round(microtime(true)*1000);
         $this->setCurlOptions();
         $this->setUrl();
         $this->setMethod();
@@ -157,7 +158,7 @@ class CurlMaker
         // Execute Curl
         $response = curl_exec($curl);
         curl_close($curl);
-
+        $time2 =  round(microtime(true)*1000);
         if ($response === false) {
             return [
                 'result' => false,
@@ -186,6 +187,7 @@ class CurlMaker
 
         return [
             'result' => true,
+            'responseTime' => doubleval($time2-$time1),
             'responseBody' => $response,
             'headers' => $headers,
             'statusCode' => $status ?? 500
