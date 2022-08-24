@@ -28,7 +28,8 @@ class Requester extends CurlMaker
                 'result' => true,
                 'body' => $result['responseBody'],
                 'headers' => $result['headers'],
-                'statusCode' => $result['statusCode']
+                'statusCode' => $result['statusCode'],
+                'responseTime' => $result['responseTime']
             ];
         }
     }
